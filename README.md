@@ -14,10 +14,9 @@ This assignment introduces you to GitHub fundamentals through the GitHub Skills 
    - Starting the course creates a repository in your personal GitHub account
    - Follow the instructions in your personal course repository
    - Complete all tasks as verified by GitHub Actions
-   
-3. **Automatic Tracking**: 
-   - When you finish the course, this assignment's CI will automatically append your course repository URL below for tracking
-   - **Do not manually edit the section below**
+
+3. **Put URL of your completed course**
+   - Put URL of your finished course repo under the section "Course Repository URLs" below
 
 ## Course Repository URLs
 <!-- This section will be automatically updated by CI when students complete the course -->
