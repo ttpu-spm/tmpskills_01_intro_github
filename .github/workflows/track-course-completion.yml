@@ -1,0 +1,80 @@
+---
+name: Track Course Completion
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository_url:
+        description: 'Your GitHub Skills course repository URL'
+        required: true
+        type: string
+      student_name:
+        description: 'Your name or GitHub username'
+        required: true
+        type: string
+
+jobs:
+  add-repository:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate repository URL
+        run: |
+          # Basic validation to ensure it's a GitHub URL
+          REPO_URL="${{ inputs.repository_url }}"
+          if [[ ! "$REPO_URL" =~ ^https://github\.com/[^/]+/[^/]+/?$ ]]; then
+            echo "Error: Please provide a valid GitHub repository URL"
+            echo "Format: https://github.com/username/repository"
+            exit 1
+          fi
+
+      - name: Check if URL already exists
+        run: |
+          if grep -Fq "${{ inputs.repository_url }}" README.md; then
+            echo "Repository URL already exists in the list"
+            echo "SKIP_ADDITION=true" >> $GITHUB_ENV
+          else
+            echo "SKIP_ADDITION=false" >> $GITHUB_ENV
+          fi
+
+      - name: Add repository URL to README
+        if: env.SKIP_ADDITION == 'false'
+        run: |
+          # Find the line with the course repository URLs comment
+          COMMENT_LINE=$(grep -n "This section will be automatically updated" README.md | cut -d: -f1)
+
+          if [ -z "$COMMENT_LINE" ]; then
+            echo "Error: Could not find the course repository URLs section"
+            exit 1
+          fi
+
+          # Create the new entry
+          TIMESTAMP=$(date '+%Y-%m-%d')
+          STUDENT_NAME="${{ inputs.student_name }}"
+          REPO_URL="${{ inputs.repository_url }}"
+          NEW_ENTRY="- **${STUDENT_NAME}**: [${REPO_URL}](${REPO_URL}) (completed: ${TIMESTAMP})"
+
+          # Insert the new entry after the comment line using awk
+          awk -v line="$COMMENT_LINE" -v entry="$NEW_ENTRY" '
+          NR == line {print; print entry; next}
+          {print}
+          ' README.md > temp_readme.md && mv temp_readme.md README.md
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add course completion for ${{ inputs.student_name }}"
+            git push
+          fi
