@@ -15,8 +15,10 @@ This assignment introduces you to GitHub fundamentals through the GitHub Skills 
    - Follow the instructions in your personal course repository
    - Complete all tasks as verified by GitHub Actions
    
-3. **Automatic Tracking**: 
-   - When you finish the course, this assignment's CI will automatically append your course repository URL below for tracking
+3. **Submit Your Completion**: 
+   - When you finish the course, submit your course repository URL using GitHub Actions
+   - Go to the "Actions" tab → "Track Course Completion" workflow → "Run workflow"
+   - Enter your name and your course repository URL (e.g., `https://github.com/yourusername/introduction-to-github`)
    - **Do not manually edit the section below**
 
 ## Course Repository URLs
